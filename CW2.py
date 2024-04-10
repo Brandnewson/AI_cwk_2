@@ -52,7 +52,7 @@ def statistics_data(data):
     means = np.mean(data, axis=0)
     std_devs = np.std(data, axis=0)
     # Calculate coefficient of variation for each feature
-    coefficient_of_variation = (std_devs / means) * 100
+    coefficient_of_variation = (std_devs / means)
     
     return coefficient_of_variation
 
