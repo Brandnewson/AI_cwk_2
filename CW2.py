@@ -137,15 +137,36 @@ def optimal_ccp_alpha(x_train, y_train, x_test, y_test):
 def tree_depths(model):
     depth=None
     # Get the depth of the unpruned tree
-    # Insert your code here for task 9
+    depth = model.tree_.max_depth
+
     return depth
 
  # Task 10 [10 marks]: Feature importance 
 def important_feature(x_train, y_train,header_list):
     best_feature=None
     # Train decision tree model and increase Cost Complexity Parameter until the depth reaches 1
-    # Insert your code here for task 10
+    # Initialize the DecisionTreeClassifier with ccp_alpha=0
+    dt_classifier = DecisionTreeClassifier(ccp_alpha=0)
+    dt_classifier.fit(x_train, y_train)
+
+    # Increase ccp_alpha gradually until the depth of the tree reaches 1
+    ccp_alpha = 0.001  # Start with a small increment
+    while True:
+        ccp_alpha += 0.001  # Increase ccp_alpha gradually
+        dt_classifier = DecisionTreeClassifier(ccp_alpha=ccp_alpha)
+        dt_classifier.fit(x_train, y_train)
+        
+        # Check if the depth of the tree is 1
+        if tree_depths(dt_classifier) == 1:
+            break
+    
+    # Extract the remaining feature
+    remaining_feature_index = dt_classifier.tree_.feature[0]
+    if remaining_feature_index != -2:  # Check if a feature was selected
+        best_feature = header_list[remaining_feature_index]
+
     return best_feature
+
 # Example usage (Template Main section):
 if __name__ == "__main__":
     # Load data
@@ -206,19 +227,19 @@ if __name__ == "__main__":
     print_tree_structure(model_optimized, header_list)
     print("-" * 50)
     
-    # # Get tree depths
-    # depth_initial = tree_depths(model)
-    # depth_pruned = tree_depths(model_pruned)
-    # depth_optimized = tree_depths(model_optimized)
-    # print(f"Initial Decision Tree Depth: {depth_initial}")
-    # print(f"Pruned Decision Tree Depth: {depth_pruned}")
-    # print(f"Optimized Decision Tree Depth: {depth_optimized}")
-    # print("-" * 50)
+    # Get tree depths
+    depth_initial = tree_depths(model)
+    depth_pruned = tree_depths(model_pruned)
+    depth_optimized = tree_depths(model_optimized)
+    print(f"Initial Decision Tree Depth: {depth_initial}")
+    print(f"Pruned Decision Tree Depth: {depth_pruned}")
+    print(f"Optimized Decision Tree Depth: {depth_optimized}")
+    print("-" * 50)
     
-    # # Feature importance
-    # important_feature_name = important_feature(x_train, y_train,header_list)
-    # print(f"Important Feature for Fraudulent Transaction Prediction: {important_feature_name}")
-    # print("-" * 50)
+    # Feature importance
+    important_feature_name = important_feature(x_train, y_train,header_list)
+    print(f"Important Feature for Fraudulent Transaction Prediction: {important_feature_name}")
+    print("-" * 50)
         
 # References: 
 # Here please provide recognition to any source if you have used or got code snippets from
@@ -226,4 +247,24 @@ if __name__ == "__main__":
 # For example: 
 # Line 80-87 is inspired by a code at https://stackoverflow.com/questions/48414212/how-to-calculate-accuracy-from-decision-trees
 
+# Line 27, reading of CSV is from https://www.w3schools.com/python/pandas/pandas_csv.asp
 
+# Line 39, usage of np.any is taught by https://www.geeksforgeeks.org/numpy-any-in-python/
+
+# Line 47-55 is a maths formula derived from https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.cuemath.com%2Fcoefficient-of-variation-formula%2F&psig=AOvVaw3DdTF0HJvdw9bMExPlQn9F&ust=1712832552461000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCLDZxc-8t4UDFQAAAAAdAAAAABAE
+
+# Line 72 is learnt by studying documentation on train_test_split on https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
+
+# Line 80 on DecisionTreeClassifier is https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
+
+# Line 82 is inspired by a discussion on .fit on Stackoverflow https://stackoverflow.com/questions/45704226/what-does-the-fit-method-in-scikit-learn-do
+
+# Lines 96 - 104 is learnt through https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html
+
+# Line 101 is from the scikit documentation https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html
+
+# Line 102 is from the scikit documentation https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html
+
+# Line 140 is drafted through a series of examples on https://scikit-learn.org/stable/modules/tree.html
+
+# Line 164 was inspired by a series of discussions on what .feature means on stackoverflow https://stackoverflow.com/questions/39708304/what-is-the-output-of-clf-tree-feature
