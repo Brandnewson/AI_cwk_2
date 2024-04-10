@@ -34,7 +34,9 @@ def load_data(file_path, delimiter=','):
 # Task 2[10 marks]: Give back the data by removing the rows with -99 values 
 def filter_data(data):
     filtered_data=[None]*1
-    # Insert your code here for task 2
+    # data! = 99 creates a boolearn Dataframe, assigning true to anything != -99
+    # dropna() removes any rows with NaN values, which is anything -99
+    filtered_data= data[data!= -99].dropna() 
 
     return filtered_data
 
@@ -106,11 +108,11 @@ if __name__ == "__main__":
     print(f"Data is read. Number of Rows: {num_rows}"); 
     print("-" * 50)
 
-    # # Filter data
-    # data_filtered = filter_data(data)
-    # num_rows_filtered=data_filtered.shape[0]
-    # print(f"Data is filtered. Number of Rows: {num_rows_filtered}"); 
-    # print("-" * 50)
+    # Filter data
+    data_filtered = filter_data(data)
+    num_rows_filtered=data_filtered.shape[0]
+    print(f"Data is filtered. Number of Rows: {num_rows_filtered}"); 
+    print("-" * 50)
 
     # # Data Statistics
     # coefficient_of_variation = statistics_data(data_filtered)
