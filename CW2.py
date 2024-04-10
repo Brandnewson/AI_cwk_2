@@ -27,26 +27,31 @@ def load_data(file_path, delimiter=','):
     df = pd.read_csv(file_path)
     num_rows = len(df)
     header_list = df.columns.tolist()
-    data = df
+    data = df.to_numpy()
 
     return num_rows, data, header_list
 
 # Task 2[10 marks]: Give back the data by removing the rows with -99 values 
 def filter_data(data):
     filtered_data=[None]*1
-    # data! = 99 creates a boolearn Dataframe, assigning true to anything != -99
-    # dropna() removes any rows with NaN values, which is anything -99
-    filtered_data= data[data!= -99].dropna() 
+    
+    # Remove rows with -99 values
+    filtered_data = data[~np.any(data == -99, axis=1)]
 
     return filtered_data
 
 # Task 3 [10 marks]: Data statistics, return the coefficient of variation for each feature, make sure to remove the rows with nan before doing this. 
+# coefficient of variation measures the relative variability or dispersion of a dataset
+# feature = col
 def statistics_data(data):
     coefficient_of_variation=None
     data=filter_data(data)
-    # Calculate the mean and standard deviation for each feature
-    # Insert your code here for task 3
-
+    # Calculate mean and standard deviation for each feature
+    means = np.mean(data, axis=0)
+    std_devs = np.std(data, axis=0)
+    # Calculate coefficient of variation for each feature
+    coefficient_of_variation = (std_devs / means) * 100
+    
     return coefficient_of_variation
 
 # Task 4 [10 marks]: Split the dataset into training (70%) and testing sets (30%), 
@@ -114,12 +119,13 @@ if __name__ == "__main__":
     print(f"Data is filtered. Number of Rows: {num_rows_filtered}"); 
     print("-" * 50)
 
-    # # Data Statistics
-    # coefficient_of_variation = statistics_data(data_filtered)
-    # print("Coefficient of Variation for each feature:")
-    # for header, coef_var in zip(header_list[:-1], coefficient_of_variation):
-    #     print(f"{header}: {coef_var}")
-    # print("-" * 50)
+    # Data Statistics
+    coefficient_of_variation = statistics_data(data_filtered)
+    print("Coefficient of Variation for each feature:")
+    for header, coef_var in zip(header_list[:-1], coefficient_of_variation):
+        print(f"{header}: {coef_var}")
+    print("-" * 50)
+
     # # Split data
     # x_train, x_test, y_train, y_test = split_data(data_filtered)
     # print(f"Train set size: {len(x_train)}")
