@@ -46,6 +46,8 @@ def filter_data(data):
 def statistics_data(data):
     coefficient_of_variation=None
     data=filter_data(data)
+    # Remove rows with NaN values
+    data = data[~np.isnan(data).any(axis=1)]
     # Calculate mean and standard deviation for each feature
     means = np.mean(data, axis=0)
     std_devs = np.std(data, axis=0)
@@ -61,14 +63,24 @@ def statistics_data(data):
 def split_data(data, test_size=0.3, random_state=1):
     x_train, x_test, y_train, y_test=None, None, None, None
     np.random.seed(1)
-    # Insert your code here for task 4
+    # Assuming the target variable is in the last column
+    x = data[:, :-1]  # Features, i.e. likelihood of fraudulent transaction
+    y = data[:, -1]   # Target variable, i.e. prediction of fraudulent transaction
 
+    # Split the dataset into training and testing sets, stratified by the target variable
+    # Stratification refers to the process of dividing a dataset into subsets (such as training and testing sets) in such a way that the proportion of classes is approximately the same in each subset as it is in the original dataset.
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, stratify=y, random_state=random_state)
+    
     return x_train, x_test, y_train, y_test
 
 # Task 5 [10 marks]: Train a decision tree model with cost complexity parameter of 0
 def train_decision_tree(x_train, y_train,ccp_alpha=0):
     model=None
-    # Insert your code here for task 5
+    # Initialize the DecisionTreeClassifier with the specified cost complexity parameter
+    dt_classifier = DecisionTreeClassifier(ccp_alpha=ccp_alpha)
+    # Train the decision tree model using the training data
+    model = dt_classifier.fit(x_train, y_train)
+
     return model
 
 # Task 6 [10 marks]: Make predictions on the testing set 
@@ -126,17 +138,17 @@ if __name__ == "__main__":
         print(f"{header}: {coef_var}")
     print("-" * 50)
 
-    # # Split data
-    # x_train, x_test, y_train, y_test = split_data(data_filtered)
-    # print(f"Train set size: {len(x_train)}")
-    # print(f"Test set size: {len(x_test)}")
-    # print("-" * 50)
+    # Split data
+    x_train, x_test, y_train, y_test = split_data(data_filtered)
+    print(f"Train set size: {len(x_train)}")
+    print(f"Test set size: {len(x_test)}")
+    print("-" * 50)
     
-    # # Train initial Decision Tree
-    # model = train_decision_tree(x_train, y_train)
-    # print("Initial Decision Tree Structure:")
-    # print_tree_structure(model, header_list)
-    # print("-" * 50)
+    # Train initial Decision Tree
+    model = train_decision_tree(x_train, y_train)
+    print("Initial Decision Tree Structure:")
+    print_tree_structure(model, header_list)
+    print("-" * 50)
     
     # # Evaluate initial model
     # acc_test, recall_test = evaluate_model(model, x_test, y_test)
