@@ -86,13 +86,21 @@ def train_decision_tree(x_train, y_train,ccp_alpha=0):
 # Task 6 [10 marks]: Make predictions on the testing set 
 def make_predictions(model, X_test):
     y_test_predicted=None
-    # Insert your code here for task 6
+    # Make predictions using the trained decision tree model
+    y_test_predicted = model.predict(X_test)
+    
     return y_test_predicted
 
 # Task 7 [10 marks]: Evaluate the model performance by taking test dataset and giving back the accuracy and recall 
 def evaluate_model(model, x, y):
     accuracy, recall=None,None
-    # Insert your code here for task 7
+    # Make predictions using the trained model
+    y_pred = model.predict(x_test)
+    
+    # Calculate accuracy and recall
+    accuracy = accuracy_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+
     return accuracy, recall
 
 # Task 8 [10 marks]: Write a function that gives the optimal value for cost complexity parameter
@@ -100,7 +108,28 @@ def evaluate_model(model, x, y):
 def optimal_ccp_alpha(x_train, y_train, x_test, y_test):
     optimal_ccp_alpha=None
 
-    # Insert your code here for task 8
+    # Initialize the DecisionTreeClassifier with ccp_alpha=0, trains it on the training data.
+    dt_classifier = DecisionTreeClassifier(ccp_alpha=0)
+    dt_classifier.fit(x_train, y_train)
+
+    # Calculate the accuracy of the unpruned model
+    unpruned_accuracy = accuracy_score(y_test, dt_classifier.predict(x_test))
+
+    # Gradually increase ccp_alpha gradually until accuracy drops more than 1%
+    ccp_alpha = 0.001  # Start with a small increment
+    while True:
+        ccp_alpha += 0.001  # Increase ccp_alpha gradually
+        dt_classifier = DecisionTreeClassifier(ccp_alpha=ccp_alpha)
+        dt_classifier.fit(x_train, y_train)
+        test_accuracy = accuracy_score(y_test, dt_classifier.predict(x_test))
+
+        # Stops if accuracy dropped more than 1% from the unpruned model
+        if test_accuracy < unpruned_accuracy - 0.01:
+            break
+        
+        # Update optimal_alpha and max_accuracy
+        optimal_ccp_alpha = ccp_alpha
+        # max_accuracy = test_accuracy
 
     return optimal_ccp_alpha
 
@@ -150,28 +179,32 @@ if __name__ == "__main__":
     print_tree_structure(model, header_list)
     print("-" * 50)
     
-    # # Evaluate initial model
-    # acc_test, recall_test = evaluate_model(model, x_test, y_test)
-    # print(f"Initial Decision Tree - Test Accuracy: {acc_test:.2%}, Recall: {recall_test:.2%}")
-    # print("-" * 50)
-    # # Train Pruned Decision Tree
-    # model_pruned = train_decision_tree(x_train, y_train, ccp_alpha=0.002)
-    # print("Pruned Decision Tree Structure:")
-    # print_tree_structure(model_pruned, header_list)
-    # print("-" * 50)
-    # # Evaluate pruned model
-    # acc_test_pruned, recall_test_pruned = evaluate_model(model_pruned, x_test, y_test)
-    # print(f"Pruned Decision Tree - Test Accuracy: {acc_test_pruned:.2%}, Recall: {recall_test_pruned:.2%}")
-    # print("-" * 50)
-    # # Find optimal ccp_alpha
-    # optimal_alpha = optimal_ccp_alpha(x_train, y_train, x_test, y_test)
-    # print(f"Optimal ccp_alpha for pruning: {optimal_alpha:.4f}")
-    # print("-" * 50)
-    # # Train Pruned and Optimized Decision Tree
-    # model_optimized = train_decision_tree(x_train, y_train, ccp_alpha=optimal_alpha)
-    # print("Optimized Decision Tree Structure:")
-    # print_tree_structure(model_optimized, header_list)
-    # print("-" * 50)
+    # Evaluate initial model
+    acc_test, recall_test = evaluate_model(model, x_test, y_test)
+    print(f"Initial Decision Tree - Test Accuracy: {acc_test:.2%}, Recall: {recall_test:.2%}")
+    print("-" * 50)
+    
+    # Train Pruned Decision Tree
+    model_pruned = train_decision_tree(x_train, y_train, ccp_alpha=0.002)
+    print("Pruned Decision Tree Structure:")
+    print_tree_structure(model_pruned, header_list)
+    print("-" * 50)
+
+    # Evaluate pruned model
+    acc_test_pruned, recall_test_pruned = evaluate_model(model_pruned, x_test, y_test)
+    print(f"Pruned Decision Tree - Test Accuracy: {acc_test_pruned:.2%}, Recall: {recall_test_pruned:.2%}")
+    print("-" * 50)
+
+    # Find optimal ccp_alpha
+    optimal_alpha = optimal_ccp_alpha(x_train, y_train, x_test, y_test)
+    print(f"Optimal ccp_alpha for pruning: {optimal_alpha:.4f}")
+    print("-" * 50)
+
+    # Train Pruned and Optimized Decision Tree
+    model_optimized = train_decision_tree(x_train, y_train, ccp_alpha=optimal_alpha)
+    print("Optimized Decision Tree Structure:")
+    print_tree_structure(model_optimized, header_list)
+    print("-" * 50)
     
     # # Get tree depths
     # depth_initial = tree_depths(model)
